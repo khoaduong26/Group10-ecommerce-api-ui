@@ -34,7 +34,7 @@ const LoginPage = () => {
                     }
                 })
                 const nextUrl = res?.user?.role === 'ADMIN' ? '/admin/profile' : '/';
-                navigate(res?.url || nextUrl, { replace: true });
+                navigate(nextUrl, { replace: true });
 
             } else {
                 notification.error({

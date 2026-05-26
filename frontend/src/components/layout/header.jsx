@@ -1,12 +1,28 @@
 import React, { useContext, useState } from 'react';
 import { UsergroupAddOutlined, HomeOutlined, SettingOutlined } from '@ant-design/icons';
-import { Menu } from 'antd';
+import { Menu, Modal } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/auth.context';
 
 const Header = () => {
     const navigate = useNavigate();
     const { auth, logout } = useContext(AuthContext);
+
+    const [current, setCurrent] = useState('mail');
+
+    const confirmLogout = () => {
+        Modal.confirm({
+            title: 'Confirm logout',
+            content: 'Are you sure you want to log out?',
+            okText: 'Log out',
+            cancelText: 'Cancel',
+            onOk: () => {
+                logout();
+                setCurrent('home');
+                navigate('/login');
+            }
+        });
+    };
 
     const items = [
         {
@@ -26,11 +42,7 @@ const Header = () => {
             icon: <SettingOutlined />,
             children: [
                 ...(auth.isAuthenticated ? [{
-                    label: <span onClick={() => {
-                        logout();
-                        setCurrent("home");
-                        navigate("/");
-                    }}>Đăng xuất</span>,
+                    label: <span onClick={confirmLogout}>Đăng xuất</span>,
                     key: 'logout',
                 }] : [
                     {
@@ -41,8 +53,6 @@ const Header = () => {
             ],
         },
     ];
-
-    const [current, setCurrent] = useState('mail');
 
     const onClick = (e) => {
         setCurrent(e.key);

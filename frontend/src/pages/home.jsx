@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ShopHeader from '../components/shop/ShopHeader';
 import HeroBanner from '../components/shop/HeroBanner';
 import SectionHeader from '../components/shop/SectionHeader';
@@ -14,6 +15,7 @@ import {
   fetchProducts,
   fetchPromotionProducts
 } from '../util/catalog.api';
+import { AuthContext } from '../components/context/auth.context';
 
 const debounce = (fn, delay = 400) => {
   let timer;
@@ -24,6 +26,8 @@ const debounce = (fn, delay = 400) => {
 };
 
 const HomePage = () => {
+  const { auth, appLoading } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [categories, setCategories] = useState([]);
   const [latest, setLatest] = useState([]);
@@ -107,9 +111,18 @@ const HomePage = () => {
   );
 
   useEffect(() => {
+    if (appLoading) {
+      return;
+    }
+
+    if (auth?.isAuthenticated && auth?.user?.role === 'ADMIN') {
+      navigate('/admin/profile', { replace: true });
+      return;
+    }
+
     loadLanding();
     loadCatalog({ ...filters, search });
-  }, []);
+  }, [appLoading, auth?.isAuthenticated, auth?.user?.role]);
 
   const handleFilterChange = (patch) => {
     const nextFilters = { ...filters, ...patch, page: 1, search };
